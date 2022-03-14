@@ -1,0 +1,219 @@
+
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <title>JS Canvas</title>
+
+
+</head>
+<body id="lout_parent">
+    <canvas id="canvas" width="300" height="300" style="border:1px solid black;"></canvas>
+
+    <input type="button" id="btn_x" value="x" onclick="m_clear()" />
+    <input type="button" id="btn_sqare" value="sqare" onclick="m_main()" />
+
+
+</body>
+
+
+<script src="./../../../kstools_js/src/tool/math/MsAxis.js"></script>
+<script src="./../../../kstools_js/src/tool/math/MsRandom.js"></script>
+<script src="./../../../kstools_js/src/tool/view/MsSurfaceView.js"></script>
+<script src="./../../../kstools_js/src/tool/drawable/MsDrawable.js"></script>
+<script src="./../../../kstools_js/src/tool/engine/MsEnginePhysical.js"></script>
+<script src="./../../../kstools_js/src/tool/engine/MsEnginePhysical_Object.js"></script>
+
+<script type="text/javascript">
+
+
+window.onload = function(){m_main()};
+
+
+window.addEventListener("keydown", (e) => {
+  m_inputKey(e.keyCode);
+});
+function m_inputKey(keycode)
+{
+  if(keycode == 38) //up
+  {
+    m_user.m_inputStopY();
+    m_user.m_inputAccY(-15);
+  }
+  else if(keycode == 40) //dn
+  {
+    
+  }
+  else if(keycode == 37) //lt
+  {
+    m_user.m_inputAccX(-10);
+  }
+  else if(keycode == 39) //rt
+  {
+    m_user.m_inputAccX(10);
+  }
+}
+
+
+function m_main(){
+
+  console.log("## m_main()");
+  let m_canvas = document.getElementById("canvas");
+  
+  m_init();
+
+  MsSurfaceView.m_init(m_canvas, 40);
+  MsSurfaceView.m_start();
+  
+}
+
+
+
+function m_init()
+{
+  console.log("## m_init()");
+}
+
+let arylist_object = [];
+MsSurfaceView.m_draw = function(context2d)
+{
+  if(MsSurfaceView.m_tick % 60 == 0)
+  {
+    m_sysCreateBall(MsRandom.m_getInt_range(MsSurfaceView.canvas.width), 0, 0, 0);
+  }
+
+  for(let i_ins = 0; i_ins < arylist_object.length; i_ins++)
+  {
+    let dest = arylist_object[i_ins];
+    MsEnginePhysical.m_calc(dest, 0, -9999, 300, 280);
+
+    if(!dest.m_isStilMoveY())
+    {
+      arylist_object.splice(i_ins, 1);
+      i_ins--;
+    }
+  }
+  MsEnginePhysical.m_calc(m_user, 0, -9999, 300, 280);
+
+  MsDrawable.m_drawArrowAngle(context2d, 30,30,30,(MsSurfaceView.m_tick%360) * 5);
+
+  for(let i_ins = 0; i_ins < arylist_object.length; i_ins++)
+  {
+    MsDrawable.m_drawCircleFill_cxcyr(context2d, arylist_object[i_ins].ptx,arylist_object[i_ins].pty,10);
+  }
+
+  context2d.drawImage(bmp_mob, 
+    0, 0, 80, 80, 
+    m_user.ptx-40, m_user.pty-68, 80, 80);
+  
+}
+
+const m_user = new MsEnginePhysical_Object();
+function m_sysCreateUser()
+{
+  m_user.ptx = axisX;
+  m_user.pty = axisY;
+}
+
+function m_sysCreateBall(axisX, axisY, accX, accY)
+{
+  const newObject = new MsEnginePhysical_Object();
+  newObject.ptx = axisX;
+  newObject.pty = axisY;
+  newObject.accx = accX;
+  newObject.accy = accY;
+  arylist_object.push(newObject);
+}
+function m_inputExplosion(axisX, axisY)
+{
+  let pow = 15;
+  m_sysCreateBall(axisX, axisY, -pow, 0);
+  m_sysCreateBall(axisX, axisY, -pow, -pow);
+  m_sysCreateBall(axisX, axisY, 0, -pow);
+  m_sysCreateBall(axisX, axisY, pow, -pow);
+  m_sysCreateBall(axisX, axisY, pow, 0);
+  m_sysCreateBall(axisX, axisY, pow, pow);
+  m_sysCreateBall(axisX, axisY, 0, pow);
+  m_sysCreateBall(axisX, axisY, -pow, pow);
+}
+
+
+
+
+
+
+
+    //window.onload = function(){m_onResume()};
+    window.onresize = function(){m_onResume()};
+
+    let screenW = $(window).width();
+    let screenH = $(window).height();
+    let D_CameraView_W = 0+"px";
+    let D_CameraView_H = 0+"px";
+
+
+
+    function m_onResume()
+    {
+      //m_canvas.width = screenW*0.90;
+      //m_canvas.height = screenH*0.90;
+    }
+
+  let bmp_mob = new Image();
+  bmp_mob.src="./res/image/img_mob_0.png";
+
+
+
+
+
+
+
+  let m_inputTouchX,m_inputTouchY; 
+
+  MsSurfaceView.m_override_onClickListener = function(e, axisX, axisY){
+    m_inputTouchX = axisX;
+    m_inputTouchY = axisY;
+
+    m_draw_X();
+    m_inputExplosion(axisX, axisY);
+    //alert("ee" + x + "e" + y);
+    };
+
+  function m_draw_X() { 
+    let x = m_inputTouchX;
+    let y = m_inputTouchY;
+
+    MsSurfaceView.context2d.strokeStyle = "#DDDD00"; 
+    MsSurfaceView.context2d.beginPath(); 
+    MsSurfaceView.context2d.moveTo(x - 20, y - 20); 
+    MsSurfaceView.context2d.lineTo(x + 20, y + 20); 
+    MsSurfaceView.context2d.moveTo(x + 20, y - 20); 
+    MsSurfaceView.context2d.lineTo(x - 20, y + 20); 
+    MsSurfaceView.context2d.stroke(); 
+  } 
+
+  function m_draw_sqare() { 
+    let x = m_inputTouchX;
+    let y = m_inputTouchY;
+
+    MsSurfaceView.context2d.strokeStyle = "#FF0000"; 
+    MsSurfaceView.context2d.strokeRect(x, y, 50, 50); 
+  } 
+
+  function m_clear()
+  {
+    MsSurfaceView.context2d.clearRect(0,0,m_canvas.width, m_canvas.height);
+    
+  }
+
+
+
+
+</script>
+
+</html>
