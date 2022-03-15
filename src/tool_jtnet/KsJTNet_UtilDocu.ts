@@ -5,7 +5,7 @@ class KsJTNet_UtilDocu {
     
     m_getHeader(docuID4Len:string):string
     {
-        const KsDate = require('./../ksnode/util/KsDate');
+        const KsDate = require('./../tool/util/KsDate');
         let ksDate = new KsDate.KsDate();
 
         let newDate = new Date();
@@ -66,10 +66,27 @@ class KsJTNet_UtilDocu {
 
 
 
-    m_getDocu_Auth(track2:string, kindOfTrack2:string, priceGood:string, priceTax:string, priceTFree:string, priceTips:string):any
+    m_getDocu_Auth(track2:string, kindOfTrack2:string, priceTotal:string, priceGood:string, priceTax:string, priceTFree:string, priceTips:string, ator:String):any
     {
         const ByteBuffer = require("bytebuffer");
 
+        if(priceTotal == null || priceTotal == undefined) priceTotal = "";
+        if(priceGood == null || priceGood == undefined) priceGood = "";
+        if(priceTax == null || priceTax == undefined) priceTax = "";
+        if(priceTFree == null || priceTFree == undefined) priceTFree = "";
+        if(priceTips == null || priceTips == undefined) priceTips = "";
+        if(ator == null || ator == undefined) ator = "";
+
+        console.group();
+        console.log("### JTNet Auth Document ###");
+        console.log("# priceTotal " + priceTotal);
+        console.log("# priceGood  " + priceGood);
+        console.log("# priceTax   " + priceTax);
+        console.log("# priceTFree " + priceTFree);
+        console.log("# priceTips  " + priceTips);
+        console.log("# ator       " + ator);
+        console.log("### JTNet Auth Document END ###");
+        console.groupEnd();
         
         let docu_header:string = this.m_getHeader("1010");
 
@@ -77,7 +94,7 @@ class KsJTNet_UtilDocu {
         let docu_body_temp:Array<string> = [];
         docu_body_temp[idx++] = "Q";
         docu_body_temp[idx++] = ("00"+track2).padEnd(100, " "); // 카드번호.
-        docu_body_temp[idx++] = "00"; //할부개월
+        docu_body_temp[idx++] = (""+ator).padStart(2,"0"); //할부개월
         docu_body_temp[idx++] = (""+priceGood).padStart(9,"0");  //goods Price
         docu_body_temp[idx++] = (""+priceTax).padStart(9,"0");    //Tax
         docu_body_temp[idx++] = (""+priceTips).padStart(9,"0");     //Service
@@ -225,7 +242,7 @@ class KsJTNet_UtilDocu {
 
         let iconv = require('iconv-lite');
 
-        let MsDBD = require('./../ksnode/dbd/MsDBD');
+        let MsDBD = require('./../tool/dbd/MsDBD');
         let msdbd = new MsDBD.MsDBD;
 
         let temp:string;

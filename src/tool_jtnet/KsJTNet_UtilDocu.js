@@ -5,7 +5,7 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
     function KsJTNet_UtilDocu() {
     }
     KsJTNet_UtilDocu.prototype.m_getHeader = function (docuID4Len) {
-        var KsDate = require('./../ksnode/util/KsDate');
+        var KsDate = require('./../tool/util/KsDate');
         var ksDate = new KsDate.KsDate();
         var newDate = new Date();
         var yymmdd = ksDate.m_getYYMMDD(newDate);
@@ -52,14 +52,36 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         console.log("LenD: " + (bb.toArrayBuffer().byteLength - (docu_header.length + docu_body.length)));
         return Buffer.from(bb.toArrayBuffer());
     };
-    KsJTNet_UtilDocu.prototype.m_getDocu_Auth = function (track2, kindOfTrack2, priceGood, priceTax, priceTFree, priceTips) {
+    KsJTNet_UtilDocu.prototype.m_getDocu_Auth = function (track2, kindOfTrack2, priceTotal, priceGood, priceTax, priceTFree, priceTips, ator) {
         var ByteBuffer = require("bytebuffer");
+        if (priceTotal == null || priceTotal == undefined)
+            priceTotal = "";
+        if (priceGood == null || priceGood == undefined)
+            priceGood = "";
+        if (priceTax == null || priceTax == undefined)
+            priceTax = "";
+        if (priceTFree == null || priceTFree == undefined)
+            priceTFree = "";
+        if (priceTips == null || priceTips == undefined)
+            priceTips = "";
+        if (ator == null || ator == undefined)
+            ator = "";
+        console.group();
+        console.log("### JTNet Auth Document ###");
+        console.log("# priceTotal " + priceTotal);
+        console.log("# priceGood  " + priceGood);
+        console.log("# priceTax   " + priceTax);
+        console.log("# priceTFree " + priceTFree);
+        console.log("# priceTips  " + priceTips);
+        console.log("# ator       " + ator);
+        console.log("### JTNet Auth Document END ###");
+        console.groupEnd();
         var docu_header = this.m_getHeader("1010");
         var idx = 0;
         var docu_body_temp = [];
         docu_body_temp[idx++] = "Q";
         docu_body_temp[idx++] = ("00" + track2).padEnd(100, " "); // 카드번호.
-        docu_body_temp[idx++] = "00"; //할부개월
+        docu_body_temp[idx++] = ("" + ator).padStart(2, "0"); //할부개월
         docu_body_temp[idx++] = ("" + priceGood).padStart(9, "0"); //goods Price
         docu_body_temp[idx++] = ("" + priceTax).padStart(9, "0"); //Tax
         docu_body_temp[idx++] = ("" + priceTips).padStart(9, "0"); //Service
@@ -177,7 +199,7 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         console.log("Cut Header");
         console.log(resultBody);
         var iconv = require('iconv-lite');
-        var MsDBD = require('./../ksnode/dbd/MsDBD');
+        var MsDBD = require('./../tool/dbd/MsDBD');
         var msdbd = new MsDBD.MsDBD;
         var temp;
         var temp_idx = 0;

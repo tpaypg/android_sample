@@ -13,7 +13,7 @@ class KsJTNet_APIManager {
 
         console.log("KEY : " + hash);
 
-        const KsConn_Http = require('./../ksnode/conn/KsConn_Http');
+        const KsConn_Http = require('./../tool/conn/KsConn_Http');
         let response = await new KsConn_Http.KsConn_Http().m_POST('https://jms.jtnet.co.kr/jmsApi/payda/siteInfo', 
             KsConn_Http.KsConn_Http.HEADER_json,{
             servicetype:'P',

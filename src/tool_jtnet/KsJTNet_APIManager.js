@@ -53,7 +53,7 @@ var KsJTNet_APIManager = /** @class */ (function () {
                         hash = crypto.createHash('SHA256').update("P" + bno + tid).digest('hex');
                         hash = crypto.createHash('SHA256').update("" + hash + encKey).digest('hex');
                         console.log("KEY : " + hash);
-                        KsConn_Http = require('./../ksnode/conn/KsConn_Http');
+                        KsConn_Http = require('./../tool/conn/KsConn_Http');
                         return [4 /*yield*/, new KsConn_Http.KsConn_Http().m_POST('https://jms.jtnet.co.kr/jmsApi/payda/siteInfo', KsConn_Http.KsConn_Http.HEADER_json, {
                                 servicetype: 'P',
                                 // businessnumber:"1078155843",
