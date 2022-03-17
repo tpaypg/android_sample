@@ -157,7 +157,7 @@ class KsJTNet_UtilDocu {
 
 
 
-    m_getDocu_Cancel(track2:string, kindOfTrack2:string, priceGood:string, priceTax:string, priceTFree:string, priceTips:string, orgAppNo:string, orgAppTimeYYMMDD:string):any
+    m_getDocu_Cancel(track2:string, kindOfTrack2:string, priceTotal:string, priceGood:string, priceTax:string, priceTFree:string, priceTips:string, ator:string, orgAppNo:string, orgAppTimeYYMMDD:string):any
     {
         const ByteBuffer = require("bytebuffer");
 
@@ -168,7 +168,7 @@ class KsJTNet_UtilDocu {
         let docu_body_temp:Array<string> = [];
         docu_body_temp[idx++] = "Q";
         docu_body_temp[idx++] = ("00"+track2).padEnd(100, " "); // 카드번호.
-        docu_body_temp[idx++] = "00"; //할부개월
+        docu_body_temp[idx++] = (""+ator).padStart(2,"0"); //할부개월
         docu_body_temp[idx++] = (""+priceGood).padStart(9,"0");  //goods Price
         docu_body_temp[idx++] = (""+priceTax).padStart(9,"0");    //Tax
         docu_body_temp[idx++] = (""+priceTips).padStart(9,"0");     //Service
@@ -187,6 +187,8 @@ class KsJTNet_UtilDocu {
         docu_body_temp[idx++] = "".padEnd(32, " ");
         docu_body_temp[idx++] = "".padEnd(128, " ");
         let docu_body:string = docu_body_temp.join('');
+
+        console.log("########### m_getDocu_Cancel : " + docu_body);
 
 
         idx = 0;

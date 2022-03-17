@@ -132,14 +132,14 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         // console.log("Len : " + bb.toArrayBuffer().byteLength);
         return Buffer.from(bb.toArrayBuffer());
     };
-    KsJTNet_UtilDocu.prototype.m_getDocu_Cancel = function (track2, kindOfTrack2, priceGood, priceTax, priceTFree, priceTips, orgAppNo, orgAppTimeYYMMDD) {
+    KsJTNet_UtilDocu.prototype.m_getDocu_Cancel = function (track2, kindOfTrack2, priceTotal, priceGood, priceTax, priceTFree, priceTips, ator, orgAppNo, orgAppTimeYYMMDD) {
         var ByteBuffer = require("bytebuffer");
         var docu_header = this.m_getHeader("1050");
         var idx = 0;
         var docu_body_temp = [];
         docu_body_temp[idx++] = "Q";
         docu_body_temp[idx++] = ("00" + track2).padEnd(100, " "); // 카드번호.
-        docu_body_temp[idx++] = "00"; //할부개월
+        docu_body_temp[idx++] = ("" + ator).padStart(2, "0"); //할부개월
         docu_body_temp[idx++] = ("" + priceGood).padStart(9, "0"); //goods Price
         docu_body_temp[idx++] = ("" + priceTax).padStart(9, "0"); //Tax
         docu_body_temp[idx++] = ("" + priceTips).padStart(9, "0"); //Service
@@ -158,6 +158,7 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         docu_body_temp[idx++] = "".padEnd(32, " ");
         docu_body_temp[idx++] = "".padEnd(128, " ");
         var docu_body = docu_body_temp.join('');
+        console.log("########### m_getDocu_Cancel : " + docu_body);
         idx = 0;
         var docu_sign_temp = [];
         docu_sign_temp[idx++] = "".padEnd(16, " ");
