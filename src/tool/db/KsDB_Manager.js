@@ -77,9 +77,10 @@ var KsDB_Manager = /** @class */ (function () {
                     case 6:
                         try {
                             mariaDB.release();
+                            mariaDB.destroy();
                         }
                         catch (error) {
-                            console.log(error);
+                            console.log("!! ################## FATAL ERROR" + error);
                         }
                         return [7 /*endfinally*/];
                     case 7: return [2 /*return*/, aryResultPool];
@@ -196,6 +197,7 @@ var KsDB_Manager = /** @class */ (function () {
                         return [3 /*break*/, 8];
                     case 7:
                         mariaDBConnection.release();
+                        mariaDBConnection.destroy();
                         return [7 /*endfinally*/];
                     case 8: return [2 /*return*/, result];
                 }
@@ -231,7 +233,10 @@ var KsDB_Manager = /** @class */ (function () {
                         oneDBD.rem = "FATAL ERROR";
                         resultAryDBD = [oneDBD];
                         return [3 /*break*/, 5];
-                    case 4: return [7 /*endfinally*/];
+                    case 4:
+                        mariaDBConnection.release();
+                        mariaDBConnection.destroy();
+                        return [7 /*endfinally*/];
                     case 5: return [2 /*return*/];
                 }
             });

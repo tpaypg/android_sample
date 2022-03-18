@@ -33,9 +33,10 @@ class KsDB_Manager {
         } finally
         {
             try {
-            mariaDB.release();
+                mariaDB.release();
+                mariaDB.destroy();
             } catch (error) {
-                console.log(error);
+                console.log("!! ################## FATAL ERROR"+error);
             }
         }
 
@@ -145,6 +146,7 @@ class KsDB_Manager {
             result = null;
         } finally {
             mariaDBConnection.release();
+            mariaDBConnection.destroy();
         }
         return result;
     }
@@ -178,7 +180,8 @@ class KsDB_Manager {
             oneDBD.rem = "FATAL ERROR";
             resultAryDBD = [oneDBD];
         } finally {
-
+            mariaDBConnection.release();
+            mariaDBConnection.destroy();
         }
     }
 }    
