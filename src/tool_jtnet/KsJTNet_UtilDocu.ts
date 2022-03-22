@@ -173,8 +173,8 @@ class KsJTNet_UtilDocu {
         docu_body_temp[idx++] = (""+priceTax).padStart(9,"0");    //Tax
         docu_body_temp[idx++] = (""+priceTips).padStart(9,"0");     //Service
         docu_body_temp[idx++] = "KRW";
-        docu_body_temp[idx++] = (""+orgAppTimeYYMMDD).padEnd(6,"");   //원거래일자
-        docu_body_temp[idx++] = (""+orgAppNo).padEnd(12,"");   //원승인번호
+        docu_body_temp[idx++] = (""+orgAppTimeYYMMDD).padEnd(6," ");   //원거래일자
+        docu_body_temp[idx++] = (""+orgAppNo).padEnd(12," ");   //원승인번호
         docu_body_temp[idx++] = "".padEnd(12," ");   //원거래고유번호
         docu_body_temp[idx++] = "N  ";
         docu_body_temp[idx++] = "  ";
