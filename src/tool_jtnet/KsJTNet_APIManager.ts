@@ -14,19 +14,28 @@ class KsJTNet_APIManager {
         console.log("KEY : " + hash);
 
         const KsConn_Http = require('./../tool/conn/KsConn_Http');
-        let response = await new KsConn_Http.KsConn_Http().m_POST('https://jms.jtnet.co.kr/jmsApi/payda/siteInfo', 
-            KsConn_Http.KsConn_Http.HEADER_json,{
-            servicetype:'P',
-            // businessnumber:"1078155843",
-            // siteid:"1802100001",
-            // tokn:"085bdfe8fa05314f535976fd105346711c429babc2acbc6c2c2e69eaa71bfd34",
-            businessnumber:bno,
-            siteid:tid,
-            tokn:hash,
-            }
-        );
+        
+        let result_str:string = "";
+        try {
+            let response = await new KsConn_Http.KsConn_Http().m_POST('https://jms.jtnet.co.kr/jmsApi/payda/siteInfo', 
+                KsConn_Http.KsConn_Http.HEADER_json,{
+                servicetype:'P',
+                // businessnumber:"1078155843",
+                // siteid:"1802100001",
+                // tokn:"085bdfe8fa05314f535976fd105346711c429babc2acbc6c2c2e69eaa71bfd34",
+                businessnumber:bno,
+                siteid:tid,
+                tokn:hash,
+                }
+            );
 
-        let result_str:string = JSON.stringify(response.data , (key, value) => {if (value !== null) return value}).trim()
+            result_str = JSON.stringify(response.data , (key, value) => {if (value !== null) return value}).trim();
+        } catch (error) {
+            console.error(error);
+            result_str = "";
+        }
+
+        
 
         return result_str;
     }

@@ -77,6 +77,8 @@ class KsJTNet_UtilDocu {
         if(priceTips == null || priceTips == undefined) priceTips = "";
         if(ator == null || ator == undefined) ator = "";
 
+        
+
         console.group();
         console.log("### JTNet Auth Document ###");
         console.log("# priceTotal " + priceTotal);

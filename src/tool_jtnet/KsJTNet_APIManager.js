@@ -42,7 +42,7 @@ var KsJTNet_APIManager = /** @class */ (function () {
     }
     KsJTNet_APIManager.prototype.getAgentInfo_fromOB = function (bno, tid) {
         return __awaiter(this, void 0, void 0, function () {
-            var encKey, crypto, hash, KsConn_Http, response, result_str;
+            var encKey, crypto, hash, KsConn_Http, result_str, response, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -54,6 +54,10 @@ var KsJTNet_APIManager = /** @class */ (function () {
                         hash = crypto.createHash('SHA256').update("" + hash + encKey).digest('hex');
                         console.log("KEY : " + hash);
                         KsConn_Http = require('./../tool/conn/KsConn_Http');
+                        result_str = "";
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
                         return [4 /*yield*/, new KsConn_Http.KsConn_Http().m_POST('https://jms.jtnet.co.kr/jmsApi/payda/siteInfo', KsConn_Http.KsConn_Http.HEADER_json, {
                                 servicetype: 'P',
                                 // businessnumber:"1078155843",
@@ -63,11 +67,17 @@ var KsJTNet_APIManager = /** @class */ (function () {
                                 siteid: tid,
                                 tokn: hash,
                             })];
-                    case 1:
+                    case 2:
                         response = _a.sent();
                         result_str = JSON.stringify(response.data, function (key, value) { if (value !== null)
                             return value; }).trim();
-                        return [2 /*return*/, result_str];
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_1 = _a.sent();
+                        console.error(error_1);
+                        result_str = "";
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/, result_str];
                 }
             });
         });
