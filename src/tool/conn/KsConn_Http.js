@@ -40,7 +40,7 @@ exports.KsConn_Http = void 0;
 var KsConn_Http = /** @class */ (function () {
     function KsConn_Http() {
     }
-    KsConn_Http.prototype.m_GET = function (urlPath, data) {
+    KsConn_Http.prototype.m_GET = function (urlPath, header, data) {
         return __awaiter(this, void 0, void 0, function () {
             var axios, url, params, axios_ins, response, returns;
             return __generator(this, function (_a) {

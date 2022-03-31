@@ -1,17 +1,19 @@
 
 class KsConn_Http {
 
-    async m_GET(urlPath:string, data:{}):Promise<{}>
+    async m_GET(urlPath:string, header:{}, data:{}):Promise<{}>
     {
+        
         const axios = require('axios');
         const url = require('url'); 
 
         const params = new url.URLSearchParams(data);
 
         const axios_ins = axios.create({timeout:1000});
+        
 
         const response = await axios_ins.get(urlPath+'?'+params);
-
+        
         let returns = {
             "state":response.status as number,
             "header":response.header,
@@ -19,6 +21,7 @@ class KsConn_Http {
             //"data_cvt":decodeURI(response.data).trim(),
         }
 
+        
         console.log("STATE CODE : " + response.status);
         console.log("DATA     : " + returns.data);
         //console.log("DATA CVT : " + returns.data_cvt);

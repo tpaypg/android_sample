@@ -58,14 +58,14 @@ var KsJTNet_APIManager = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, new KsConn_Http.KsConn_Http().m_POST('https://jms.jtnet.co.kr/jmsApi/payda/siteInfo', KsConn_Http.KsConn_Http.HEADER_json, {
+                        return [4 /*yield*/, new KsConn_Http.KsConn_Http().m_GET('https://api.jtnet.co.kr/payda/v1/site/info', KsConn_Http.KsConn_Http.HEADER_json, {
                                 servicetype: 'P',
                                 // businessnumber:"1078155843",
                                 // siteid:"1802100001",
                                 // tokn:"085bdfe8fa05314f535976fd105346711c429babc2acbc6c2c2e69eaa71bfd34",
                                 businessnumber: bno,
                                 siteid: tid,
-                                tokn: hash,
+                                token: hash,
                             })];
                     case 2:
                         response = _a.sent();

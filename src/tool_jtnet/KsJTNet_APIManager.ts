@@ -17,7 +17,7 @@ class KsJTNet_APIManager {
         
         let result_str:string = "";
         try {
-            let response = await new KsConn_Http.KsConn_Http().m_POST('https://jms.jtnet.co.kr/jmsApi/payda/siteInfo', 
+            let response = await new KsConn_Http.KsConn_Http().m_GET('https://api.jtnet.co.kr/payda/v1/site/info', 
                 KsConn_Http.KsConn_Http.HEADER_json,{
                 servicetype:'P',
                 // businessnumber:"1078155843",
@@ -25,7 +25,7 @@ class KsJTNet_APIManager {
                 // tokn:"085bdfe8fa05314f535976fd105346711c429babc2acbc6c2c2e69eaa71bfd34",
                 businessnumber:bno,
                 siteid:tid,
-                tokn:hash,
+                token:hash,
                 }
             );
 
