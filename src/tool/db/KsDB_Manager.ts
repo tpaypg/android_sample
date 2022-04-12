@@ -6,9 +6,10 @@ class KsDB_Manager {
     {
         console.log("## m_toDB_getAryDBD()");
         const KsDbConnecter = require('./connecter/KsDB_Connecter');
-        const mariaDB = await KsDbConnecter.getConnection();
+        let mariaDB;
 
         try {
+            mariaDB = await KsDbConnecter.getConnection();
             // let KsDBD_Manager = require('./KsDB_Manager');
             // let ksDbdManager = new KsDBD_Manager.KsDB_Manager();
 
@@ -29,6 +30,7 @@ class KsDB_Manager {
             resultObject.rec = 400;
             resultObject.rem = "FATAL ERROR";
 
+            aryResultPool.splice(0, aryResultPool.length);
             aryResultPool.push(resultObject);
         } finally
         {
@@ -37,6 +39,15 @@ class KsDB_Manager {
                 mariaDB.destroy();
             } catch (error) {
                 console.log("!! ################## FATAL ERROR"+error);
+                let resultObject:any = new Object();
+
+                console.log("#### FATAL ERROR ####          !!!!!! - DB CRUSH");
+                resultObject.rec = 400;
+                resultObject.rem = "FATAL ERROR";
+
+                aryResultPool.splice(0, aryResultPool.length);
+                aryResultPool.push(resultObject);
+                return aryResultPool;
             }
         }
 

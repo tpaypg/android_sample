@@ -42,18 +42,18 @@ var KsDB_Manager = /** @class */ (function () {
     }
     KsDB_Manager.prototype.m_toDB_getAryDBD = function (aryResultPool, query) {
         return __awaiter(this, void 0, void 0, function () {
-            var KsDbConnecter, mariaDB, resultAry, i_ins, error_1, resultObject;
+            var KsDbConnecter, mariaDB, resultAry, i_ins, error_1, resultObject, resultObject;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         console.log("## m_toDB_getAryDBD()");
                         KsDbConnecter = require('./connecter/KsDB_Connecter');
-                        return [4 /*yield*/, KsDbConnecter.getConnection()];
+                        _a.label = 1;
                     case 1:
-                        mariaDB = _a.sent();
-                        _a.label = 2;
+                        _a.trys.push([1, 4, 6, 7]);
+                        return [4 /*yield*/, KsDbConnecter.getConnection()];
                     case 2:
-                        _a.trys.push([2, 4, 6, 7]);
+                        mariaDB = _a.sent();
                         return [4 /*yield*/, this.m_query_getAryDBD(mariaDB, query, true)];
                     case 3:
                         resultAry = _a.sent();
@@ -72,6 +72,7 @@ var KsDB_Manager = /** @class */ (function () {
                         console.log("#### FATAL ERROR ####          !!!!!! - DB CRUSH");
                         resultObject.rec = 400;
                         resultObject.rem = "FATAL ERROR";
+                        aryResultPool.splice(0, aryResultPool.length);
                         aryResultPool.push(resultObject);
                         return [3 /*break*/, 7];
                     case 6:
@@ -81,6 +82,13 @@ var KsDB_Manager = /** @class */ (function () {
                         }
                         catch (error) {
                             console.log("!! ################## FATAL ERROR" + error);
+                            resultObject = new Object();
+                            console.log("#### FATAL ERROR ####          !!!!!! - DB CRUSH");
+                            resultObject.rec = 400;
+                            resultObject.rem = "FATAL ERROR";
+                            aryResultPool.splice(0, aryResultPool.length);
+                            aryResultPool.push(resultObject);
+                            return [2 /*return*/, aryResultPool];
                         }
                         return [7 /*endfinally*/];
                     case 7: return [2 /*return*/, aryResultPool];
