@@ -53,7 +53,7 @@ class KsJTNet_Util {
             userInfo_requester == null || userInfo_requester == undefined || 
             tradeItem == null || tradeItem == undefined ) return "";
 
-            
+
 
         const KsNode_Module = require(process.env.PATH_PROJET+'/kstools_js/src/tool/node/KsNode');
         const KsNode = new KsNode_Module.KsNode();
