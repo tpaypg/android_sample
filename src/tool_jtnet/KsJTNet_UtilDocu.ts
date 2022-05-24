@@ -3,8 +3,9 @@
 class KsJTNet_UtilDocu {
 
     
-    m_getHeader(docuID4Len:string):string
+    m_getHeader(tid:string, docuID4Len:string):string
     {
+        //tid 셈플 1802100001
         const KsDate = require('./../tool/util/KsDate');
         let ksDate = new KsDate.KsDate();
 
@@ -15,7 +16,7 @@ class KsJTNet_UtilDocu {
         let idx:number = 0;
         let docu_header_temp:Array<string> = [];
         docu_header_temp[idx++] = docuID4Len;
-        docu_header_temp[idx++] = "1802100001";     //단말기 번호.
+        docu_header_temp[idx++] = (""+tid).padEnd(10," ").substring(0, 10); //단말기 번호. (TID)
         docu_header_temp[idx++] = (yymmdd+"000001").padStart(12,"0");   //
         docu_header_temp[idx++] = "1100110001";     //하드코딩 S/W 버전
         docu_header_temp[idx++] = "PF19080001";     //하드코딩 H/W 버전
@@ -27,12 +28,12 @@ class KsJTNet_UtilDocu {
         return docu_header;
     }
 
-    m_getDocu_findAppCardID(track2:string):any
+    m_getDocu_findAppCardID(tid:string, track2:string):any
     {
         const ByteBuffer = require("bytebuffer");
 
         
-        let docu_header:string = this.m_getHeader("8099");
+        let docu_header:string = this.m_getHeader(tid, "8099");
 
         let idx:number = 0;
         let docu_body_temp:Array<string> = [];
@@ -64,9 +65,26 @@ class KsJTNet_UtilDocu {
     }
 
 
+    m_getDocu_Auth(tid:string, track2:string, kindOfTrack2:string, priceTotal:string, priceGood:string, priceTax:string, priceTFree:string, priceTips:string, ator:String):any
+    {
+        let docuType = "Q";
+        let fallback = "N";
+        let trackEmv = "";
+        if(kindOfTrack2 == "APP")
+            docuType = "Q";
+        else if(kindOfTrack2 == "UNIONQR")
+        {
+            docuType = "U";
+            fallback = "Y";
+            trackEmv = track2;
+            track2 = "";
+        }    
+
+        return this.m_getDocu_Auth_AppCard(tid, docuType, track2, trackEmv, priceTotal, priceGood, priceTax, priceTFree, priceTips, ator, fallback);
+    }
 
 
-    m_getDocu_Auth(track2:string, kindOfTrack2:string, priceTotal:string, priceGood:string, priceTax:string, priceTFree:string, priceTips:string, ator:String):any
+    m_getDocu_Auth_AppCard(tid:string, docuType:string, track2:string, trackEmv:string, priceTotal:string, priceGood:string, priceTax:string, priceTFree:string, priceTips:string, ator:String, fallback:string):any
     {
         const ByteBuffer = require("bytebuffer");
 
@@ -90,11 +108,11 @@ class KsJTNet_UtilDocu {
         console.log("### JTNet Auth Document END ###");
         console.groupEnd();
         
-        let docu_header:string = this.m_getHeader("1010");
+        let docu_header:string = this.m_getHeader(tid, "1010");
 
         let idx:number = 0;
         let docu_body_temp:Array<string> = [];
-        docu_body_temp[idx++] = "Q";
+        docu_body_temp[idx++] = docuType.substring(0, 1);
         docu_body_temp[idx++] = ("00"+track2).padEnd(100, " "); // 카드번호.
         docu_body_temp[idx++] = (""+ator).padStart(2,"0"); //할부개월
         docu_body_temp[idx++] = (""+priceGood).padStart(9,"0");  //goods Price
@@ -104,9 +122,9 @@ class KsJTNet_UtilDocu {
         docu_body_temp[idx++] = "".padEnd(6," ");   //원거래일자
         docu_body_temp[idx++] = "".padEnd(12," ");   //원승인번호
         docu_body_temp[idx++] = "".padEnd(12," ");   //원거래고유번호
-        docu_body_temp[idx++] = "N  ";
+        docu_body_temp[idx++] = (""+fallback).padEnd(3," ");
         docu_body_temp[idx++] = "  ";
-        docu_body_temp[idx++] = (""+kindOfTrack2).padEnd(8, " ");
+        docu_body_temp[idx++] = ("").padEnd(8, " ");
         docu_body_temp[idx++] = (""+priceTFree).padStart(9, "0");
         docu_body_temp[idx++] = "".padEnd(18, " ");
         docu_body_temp[idx++] = "".padEnd(24, " ");
@@ -125,6 +143,20 @@ class KsJTNet_UtilDocu {
         docu_sign=""; //서명 없을시
 
 
+        idx = 0;
+        let docu_emv:string = "";
+        if(trackEmv.length > 0)
+        {
+            let docu_emv_temp:Array<string> = [];
+            docu_emv_temp[idx++] = (""+trackEmv.length).padStart(4,"0");
+            docu_emv_temp[idx++] = ""+trackEmv;
+            docu_emv = docu_emv_temp.join('');
+        }
+        else docu_emv="";
+        
+
+
+
 
         idx = 0;
         var docu_deviceid_temp = [];
@@ -133,7 +165,7 @@ class KsJTNet_UtilDocu {
 
         var bb = new ByteBuffer();
         bb.writeByte(0x02);
-        bb.writeString((""+(25+docu_header.length+docu_body.length+docu_sign.length+docu_deviceid.length)).padStart(4, "0"));
+        bb.writeString((""+(25+docu_header.length+docu_body.length+docu_emv.length+docu_sign.length+docu_deviceid.length)).padStart(4, "0"));
         bb.writeByte(0x12);
         bb.writeByte(0x12);
         bb.writeString("PFC");
@@ -145,6 +177,7 @@ class KsJTNet_UtilDocu {
         bb.writeByte(0x1c);
         bb.writeString(docu_sign);
         bb.writeByte(0x1c);
+        bb.writeString(docu_emv);
         bb.writeByte(0x1c);
         bb.writeString(docu_deviceid);
         bb.writeByte(0x0d);
@@ -159,12 +192,12 @@ class KsJTNet_UtilDocu {
 
 
 
-    m_getDocu_Cancel(track2:string, kindOfTrack2:string, priceTotal:string, priceGood:string, priceTax:string, priceTFree:string, priceTips:string, ator:string, orgAppNo:string, orgAppTimeYYMMDD:string):any
+    m_getDocu_Cancel(tid:string, track2:string, kindOfTrack2:string, priceTotal:string, priceGood:string, priceTax:string, priceTFree:string, priceTips:string, ator:string, orgAppNo:string, orgAppTimeYYMMDD:string):any
     {
         const ByteBuffer = require("bytebuffer");
 
         
-        let docu_header:string = this.m_getHeader("1050");
+        let docu_header:string = this.m_getHeader(tid, "1050");
 
         let idx:number = 0;
         let docu_body_temp:Array<string> = [];

@@ -4,7 +4,8 @@ exports.KsJTNet_UtilDocu = void 0;
 var KsJTNet_UtilDocu = /** @class */ (function () {
     function KsJTNet_UtilDocu() {
     }
-    KsJTNet_UtilDocu.prototype.m_getHeader = function (docuID4Len) {
+    KsJTNet_UtilDocu.prototype.m_getHeader = function (tid, docuID4Len) {
+        //tid 셈플 1802100001
         var KsDate = require('./../tool/util/KsDate');
         var ksDate = new KsDate.KsDate();
         var newDate = new Date();
@@ -13,7 +14,7 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         var idx = 0;
         var docu_header_temp = [];
         docu_header_temp[idx++] = docuID4Len;
-        docu_header_temp[idx++] = "1802100001"; //단말기 번호.
+        docu_header_temp[idx++] = ("" + tid).padEnd(10, " ").substring(0, 10); //단말기 번호. (TID)
         docu_header_temp[idx++] = (yymmdd + "000001").padStart(12, "0"); //
         docu_header_temp[idx++] = "1100110001"; //하드코딩 S/W 버전
         docu_header_temp[idx++] = "PF19080001"; //하드코딩 H/W 버전
@@ -24,9 +25,9 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         var docu_header = docu_header_temp.join('');
         return docu_header;
     };
-    KsJTNet_UtilDocu.prototype.m_getDocu_findAppCardID = function (track2) {
+    KsJTNet_UtilDocu.prototype.m_getDocu_findAppCardID = function (tid, track2) {
         var ByteBuffer = require("bytebuffer");
-        var docu_header = this.m_getHeader("8099");
+        var docu_header = this.m_getHeader(tid, "8099");
         var idx = 0;
         var docu_body_temp = [];
         docu_body_temp[idx++] = "Q";
@@ -52,7 +53,21 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         console.log("LenD: " + (bb.toArrayBuffer().byteLength - (docu_header.length + docu_body.length)));
         return Buffer.from(bb.toArrayBuffer());
     };
-    KsJTNet_UtilDocu.prototype.m_getDocu_Auth = function (track2, kindOfTrack2, priceTotal, priceGood, priceTax, priceTFree, priceTips, ator) {
+    KsJTNet_UtilDocu.prototype.m_getDocu_Auth = function (tid, track2, kindOfTrack2, priceTotal, priceGood, priceTax, priceTFree, priceTips, ator) {
+        var docuType = "Q";
+        var fallback = "N";
+        var trackEmv = "";
+        if (kindOfTrack2 == "APP")
+            docuType = "Q";
+        else if (kindOfTrack2 == "UNIONQR") {
+            docuType = "U";
+            fallback = "Y";
+            trackEmv = track2;
+            track2 = "";
+        }
+        return this.m_getDocu_Auth_AppCard(tid, docuType, track2, trackEmv, priceTotal, priceGood, priceTax, priceTFree, priceTips, ator, fallback);
+    };
+    KsJTNet_UtilDocu.prototype.m_getDocu_Auth_AppCard = function (tid, docuType, track2, trackEmv, priceTotal, priceGood, priceTax, priceTFree, priceTips, ator, fallback) {
         var ByteBuffer = require("bytebuffer");
         if (priceTotal == null || priceTotal == undefined)
             priceTotal = "";
@@ -76,10 +91,10 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         console.log("# ator       " + ator);
         console.log("### JTNet Auth Document END ###");
         console.groupEnd();
-        var docu_header = this.m_getHeader("1010");
+        var docu_header = this.m_getHeader(tid, "1010");
         var idx = 0;
         var docu_body_temp = [];
-        docu_body_temp[idx++] = "Q";
+        docu_body_temp[idx++] = docuType.substring(0, 1);
         docu_body_temp[idx++] = ("00" + track2).padEnd(100, " "); // 카드번호.
         docu_body_temp[idx++] = ("" + ator).padStart(2, "0"); //할부개월
         docu_body_temp[idx++] = ("" + priceGood).padStart(9, "0"); //goods Price
@@ -89,9 +104,9 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         docu_body_temp[idx++] = "".padEnd(6, " "); //원거래일자
         docu_body_temp[idx++] = "".padEnd(12, " "); //원승인번호
         docu_body_temp[idx++] = "".padEnd(12, " "); //원거래고유번호
-        docu_body_temp[idx++] = "N  ";
+        docu_body_temp[idx++] = ("" + fallback).padEnd(3, " ");
         docu_body_temp[idx++] = "  ";
-        docu_body_temp[idx++] = ("" + kindOfTrack2).padEnd(8, " ");
+        docu_body_temp[idx++] = ("").padEnd(8, " ");
         docu_body_temp[idx++] = ("" + priceTFree).padStart(9, "0");
         docu_body_temp[idx++] = "".padEnd(18, " ");
         docu_body_temp[idx++] = "".padEnd(24, " ");
@@ -107,12 +122,22 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         var docu_sign = docu_sign_temp.join('');
         docu_sign = ""; //서명 없을시
         idx = 0;
+        var docu_emv = "";
+        if (trackEmv.length > 0) {
+            var docu_emv_temp = [];
+            docu_emv_temp[idx++] = ("" + trackEmv.length).padStart(4, "0");
+            docu_emv_temp[idx++] = "" + trackEmv;
+            docu_emv = docu_emv_temp.join('');
+        }
+        else
+            docu_emv = "";
+        idx = 0;
         var docu_deviceid_temp = [];
         docu_deviceid_temp[idx++] = "MACADDRESS123123".padEnd(42, " ");
         var docu_deviceid = docu_deviceid_temp.join('');
         var bb = new ByteBuffer();
         bb.writeByte(0x02);
-        bb.writeString(("" + (25 + docu_header.length + docu_body.length + docu_sign.length + docu_deviceid.length)).padStart(4, "0"));
+        bb.writeString(("" + (25 + docu_header.length + docu_body.length + docu_emv.length + docu_sign.length + docu_deviceid.length)).padStart(4, "0"));
         bb.writeByte(0x12);
         bb.writeByte(0x12);
         bb.writeString("PFC");
@@ -124,6 +149,7 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         bb.writeByte(0x1c);
         bb.writeString(docu_sign);
         bb.writeByte(0x1c);
+        bb.writeString(docu_emv);
         bb.writeByte(0x1c);
         bb.writeString(docu_deviceid);
         bb.writeByte(0x0d);
@@ -132,9 +158,9 @@ var KsJTNet_UtilDocu = /** @class */ (function () {
         // console.log("Len : " + bb.toArrayBuffer().byteLength);
         return Buffer.from(bb.toArrayBuffer());
     };
-    KsJTNet_UtilDocu.prototype.m_getDocu_Cancel = function (track2, kindOfTrack2, priceTotal, priceGood, priceTax, priceTFree, priceTips, ator, orgAppNo, orgAppTimeYYMMDD) {
+    KsJTNet_UtilDocu.prototype.m_getDocu_Cancel = function (tid, track2, kindOfTrack2, priceTotal, priceGood, priceTax, priceTFree, priceTips, ator, orgAppNo, orgAppTimeYYMMDD) {
         var ByteBuffer = require("bytebuffer");
-        var docu_header = this.m_getHeader("1050");
+        var docu_header = this.m_getHeader(tid, "1050");
         var idx = 0;
         var docu_body_temp = [];
         docu_body_temp[idx++] = "Q";

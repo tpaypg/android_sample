@@ -2,6 +2,33 @@
 
 class KsJTNet_Util {
 
+    async m_findKindOfQR(tid:string, qrCode:string):Promise<string>
+    {
+        if(qrCode.length > 64)
+            return "UNIONQR";
+
+        const KsJTNet_APIManager = require(process.env.PATH_PROJET+'/kstools_js/src/tool_jtnet/KsJTNet_APIManager');
+        let ksJTNet_APIManager = new KsJTNet_APIManager.KsJTNet_APIManager();
+
+        const KsJTNet_UtilDocu = require(process.env.PATH_PROJET+'/kstools_js/src/tool_jtnet/KsJTNet_UtilDocu');
+        let ksJTNet_utilDocu = new KsJTNet_UtilDocu.KsJTNet_UtilDocu();
+
+        let kindOfAppCard = "APP";
+        let docu_kindOfAppCard = ksJTNet_utilDocu.m_getDocu_findAppCardID(tid, qrCode);
+        let result_kindOfAppCard = await ksJTNet_APIManager.queryTo_VANTest("dd", docu_kindOfAppCard );
+        result_kindOfAppCard = result_kindOfAppCard.toString();
+
+        if(result_kindOfAppCard.length > 116)
+        {
+            let resCode = result_kindOfAppCard.substring(116, 116+4);
+            kindOfAppCard = result_kindOfAppCard.substring(116+40, 116+40+3);
+
+            console.log(" resCode: " + resCode);
+            console.log(" resAppID: " + kindOfAppCard);
+        }
+        return kindOfAppCard;
+    }
+
     /*  원본 코드
         aryTemp.splice(0, aryTemp.length);
         await KsNode.DB_getDBD_byNid(aryTemp, tnm_userInfo, nid_requester);

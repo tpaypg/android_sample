@@ -40,6 +40,35 @@ exports.KsJTNet_Util = void 0;
 var KsJTNet_Util = /** @class */ (function () {
     function KsJTNet_Util() {
     }
+    KsJTNet_Util.prototype.m_findKindOfQR = function (tid, qrCode) {
+        return __awaiter(this, void 0, void 0, function () {
+            var KsJTNet_APIManager, ksJTNet_APIManager, KsJTNet_UtilDocu, ksJTNet_utilDocu, kindOfAppCard, docu_kindOfAppCard, result_kindOfAppCard, resCode;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (qrCode.length > 64)
+                            return [2 /*return*/, "UNIONQR"];
+                        KsJTNet_APIManager = require(process.env.PATH_PROJET + '/kstools_js/src/tool_jtnet/KsJTNet_APIManager');
+                        ksJTNet_APIManager = new KsJTNet_APIManager.KsJTNet_APIManager();
+                        KsJTNet_UtilDocu = require(process.env.PATH_PROJET + '/kstools_js/src/tool_jtnet/KsJTNet_UtilDocu');
+                        ksJTNet_utilDocu = new KsJTNet_UtilDocu.KsJTNet_UtilDocu();
+                        kindOfAppCard = "APP";
+                        docu_kindOfAppCard = ksJTNet_utilDocu.m_getDocu_findAppCardID(tid, qrCode);
+                        return [4 /*yield*/, ksJTNet_APIManager.queryTo_VANTest("dd", docu_kindOfAppCard)];
+                    case 1:
+                        result_kindOfAppCard = _a.sent();
+                        result_kindOfAppCard = result_kindOfAppCard.toString();
+                        if (result_kindOfAppCard.length > 116) {
+                            resCode = result_kindOfAppCard.substring(116, 116 + 4);
+                            kindOfAppCard = result_kindOfAppCard.substring(116 + 40, 116 + 40 + 3);
+                            console.log(" resCode: " + resCode);
+                            console.log(" resAppID: " + kindOfAppCard);
+                        }
+                        return [2 /*return*/, kindOfAppCard];
+                }
+            });
+        });
+    };
     /*  원본 코드
         aryTemp.splice(0, aryTemp.length);
         await KsNode.DB_getDBD_byNid(aryTemp, tnm_userInfo, nid_requester);
